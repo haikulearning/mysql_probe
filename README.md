@@ -49,6 +49,20 @@ $ cd $GOPATH/src/github.com/haikulearning/mysql_probe
 $ make
 ````
 
+### Cross-compiling
+
+If you need to deploy `mysql_probe` to another platform (i.e. build on OS X, deploy to Linux), Go makes that fairly straightforward!
+
+````bash
+$ cd $GOPATH/src/github.com/haikulearning/mysql_probe
+$ make all
+# or target a specific OS
+$ make mac
+$ make linux
+````
+
+If the above commands aren't working for you, be you've locally installed appropriate Go compilers for the target platforms (here's a Stack Overflow question [describing how to install them on OS X](http://stackoverflow.com/questions/12168873/cross-compile-go-on-osx)).
+
 ## Testing
 A dockerfile is available in docker/test for spinning up an instance of this app.
 
