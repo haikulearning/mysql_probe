@@ -10,7 +10,7 @@ import (
   "github.com/haikulearning/mysql_probe/mysqltest"
 )
 
-var required_up_checks = []string{"connect", "connection_count_lte_2400"}
+var required_up_checks = []string{"connect", "threads_connected_count_lte_2400"}
 
 type StatuServer struct {
 	reportdir     string

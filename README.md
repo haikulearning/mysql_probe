@@ -2,6 +2,11 @@
 
 A golang application that checks a mysql database, writing results to flat files and/or runs an HTTP server for haproxy health checks based on those checks
 
+# Requirements
+
+* MySQL >= 5.1.12
+* Access to a MySQL user with REPLICATION CLIENT permissions (or ability to create one)
+
 ## Installation
 
 1. Install golang 1.3+
