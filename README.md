@@ -15,14 +15,13 @@ A golang application that checks a mysql database, writing results to flat files
 ### MySQL configuration
 
 Create a MySQL user with the following permissions:
-* PROCESS
 * REPLICATION CLIENT
 
 For example:
 
 ````sql
-CREATE USER mysql_probe@'%' IDENTIFIED BY 'As92rj05UvKK';
-GRANT PROCESS,REPLICATION CLIENT ON *.* TO mysql_probe@'%';
+CREATE USER 'mysql_probe'@'127.0.0.1' IDENTIFIED BY 'As92rj05UvKK';
+GRANT REPLICATION CLIENT ON *.* TO 'mysql_probe'@'127.0.0.1';
 ````
 
 ## Running
