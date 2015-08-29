@@ -7,6 +7,7 @@ Because this project has not reached 1.0 yet anything may change at any time. Th
 ## [Unreleased][unreleased]
 ### Added
 * This Change Log!
+* Initial support for cross-compiling via make
 
 ## [0.1.0] - 2015-08-27
 ### Breaking Changes
@@ -15,10 +16,12 @@ Because this project has not reached 1.0 yet anything may change at any time. Th
 ### Added
 * Use `mysql_probe test` or `mysql_probe serve` to run only the test or status server functionality, respectively.
 * Status server supports `--reports` and `--server_port` flags.
+* A very basic Makefile
 
 ## [0.0.3] - 2015-08-20
 ### Added
 * A basic status HTTP server
+* Tests time out if MySQL is slow to respond
 
 ### Changed
 * Moved the testing logic of `mysql_probe` into a background Goroutine.
@@ -26,7 +29,7 @@ Because this project has not reached 1.0 yet anything may change at any time. Th
 ## [0.0.2] - 2014-12-18
 ### Added
 * JSON logs
-* reports directory
+* Reports directory
 
 ## [0.0.1] - 2014-12-18
 ### Added
