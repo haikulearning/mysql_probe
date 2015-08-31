@@ -100,7 +100,8 @@ func (t *MysqlTest) RunOnceWithTimeout() {
     res := MysqlTestResult{}
     res.AddTextResult("connect", "down # timeout")
     for _,c := range counts_to_check {
-      res.AddTextResult(fmt.Sprintf("connection_count_lte_%d", c), "down # timeout")
+      res.AddTextResult(fmt.Sprintf("threads_connected_count_lte_%d", c), "down # timeout")
+      res.AddTextResult(fmt.Sprintf("threads_running_count_lte_%d", c), "down # timeout")
     }
     for _,c := range seconds_to_check {
        res.AddTextResult(fmt.Sprintf("replication_delay_lte_%d", c), "down # timeout")
@@ -138,22 +139,30 @@ func (t *MysqlTest) RunOnce() *MysqlTestResult {
 	}
 
 	start = time.Now()
-	count, err := t.CountConnections()
+	threads_connected, threads_running, description, err := t.CountThreadInfo()
 	if err != nil {
-		description := fmt.Sprintf("Connection count check failed: %s", err.Error())
+		description = fmt.Sprintf("%s: %s", description, err.Error())
 		for _, connections := range counts_to_check {
-			res.AddTextResult(fmt.Sprintf("connection_count_lte_%d", connections), fmt.Sprintf("down # Connection count test (%d connections <= %d)? : %s", count, connections, description))
+			res.AddTextResult(fmt.Sprintf("threads_connected_count_lte_%d", connections), fmt.Sprintf("down # Threads Connected count test (%d connected <= %d)? : %s", threads_connected, connections, description))
+			res.AddTextResult(fmt.Sprintf("threads_running_count_lte_%d", connections), fmt.Sprintf("down # Threads Running count test (%d running <= %d)? : %s", threads_running, connections, description))
 		}
 	} else {
-		description := fmt.Sprintf("Connection count is %d", count)
 		for _, connections := range counts_to_check {
 			var status string
-			if count <= connections {
-				status = fmt.Sprintf("up %s", t.GetWeight(count, connections))
+
+			if threads_connected <= connections {
+				status = fmt.Sprintf("up %s", t.GetWeight(threads_connected, connections))
 			} else {
 				status = "down"
 			}
-			res.AddTextResult(fmt.Sprintf("connection_count_lte_%d", connections), fmt.Sprintf("%s # Connection count test (%d connections <= %d)? : %s", status, count, connections, description))
+			res.AddTextResult(fmt.Sprintf("threads_connected_count_lte_%d", connections), fmt.Sprintf("%s # Threads Connected count test (%d connected <= %d)?", status, threads_connected, connections))
+
+			if threads_running <= connections {
+				status = fmt.Sprintf("up %s", t.GetWeight(threads_running, connections))
+			} else {
+				status = "down"
+			}
+			res.AddTextResult(fmt.Sprintf("threads_running_count_lte_%d", connections), fmt.Sprintf("%s # Threads Connected count test (%d connected <= %d)?", status, threads_running, connections))
 		}
 	}
 
@@ -246,20 +255,42 @@ func (t *MysqlTest) CheckReplication() (int64, string, error) {
 	return seconds_behind_master, description, err
 }
 
-func (t *MysqlTest) CountConnections() (int64, error) {
+func (t *MysqlTest) CountThreadInfo() (int64, int64, string, error) {
+  var description string
+
 	if t.db == nil {
-		return -2, nil
+		return -2, -2, "No DB connection available", nil
 	}
-	row := t.db.QueryRow("SELECT count(*) FROM INFORMATION_SCHEMA.PROCESSLIST WHERE USER != 'system user'")
-	var processcount int64
-	err := row.Scan(&processcount)
+
+  // INFORMATION_SCHEMA.SESSION_STATUS introduced in MySQL 5.1.12
+  // http://dev.mysql.com/doc/refman/5.1/en/status-table.html
+	rows, err := t.db.Query("SELECT VARIABLE_NAME, VARIABLE_VALUE FROM INFORMATION_SCHEMA.SESSION_STATUS WHERE VARIABLE_NAME IN ('THREADS_CONNECTED', 'THREADS_RUNNING')")
 	if err != nil {
-		t.JsonLog(fmt.Sprintf("Couldn't determine connection count: %s", err.Error()))
-		return -1, err
+		description = "Query 'SELECT ... FROM INFORMATION_SCHEMA.SESSION_STATUS ...' failed"
+		t.JsonLog(fmt.Sprintf("%s: %s", description, err.Error()))
+		t.db = nil
+		return -1, -1, description, err
 	}
-	processcount = processcount - 1 // Deduct this connection from teh count.
-	t.JsonLog(fmt.Sprintf("Process count: %d", processcount))
-	return processcount, nil
+
+	var threads_connected int64
+	var threads_running int64
+	var variable_name string
+	var variable_val int64
+	for rows.Next() {
+		err = rows.Scan(&variable_name, &variable_val)
+		switch variable_name {
+		case "THREADS_CONNECTED":
+			threads_connected = variable_val
+		case "THREADS_RUNNING":
+			threads_running = variable_val
+		}
+	}
+
+	threads_connected = threads_connected - 1 // Deduct this connection from teh count.
+
+	description = fmt.Sprintf("Threads Connected: %d; Threads Running: %d", threads_connected, threads_running)
+	t.JsonLog(description)
+	return threads_connected, threads_running, description, nil
 }
 
 func (t *MysqlTest) Connect() error {

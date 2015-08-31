@@ -20,7 +20,6 @@ import (
 	"github.com/codegangsta/cli"
 	"github.com/haikulearning/mysql_probe/mysqltest"
 	"github.com/haikulearning/mysql_probe/statusserver"
-	_ "github.com/go-sql-driver/mysql"
 	"os"
   "log"
   "sync"
