@@ -1,8 +1,0 @@
-#!/bin/bash -e
-# get dependencies and then make mysql_probe for local system.
-
-go get github.com/codegangsta/cli
-go get github.com/go-sql-driver/mysql
-make
-shasum mysql_probe
-file mysql_probe

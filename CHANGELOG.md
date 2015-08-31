@@ -9,6 +9,9 @@ Because this project has not reached 1.0 yet anything may change at any time. Th
 * This Change Log!
 * Initial support for cross-compiling via make
 
+### Changed
+* Major improvements to the Makefile inspired by the [akitu/github-release project's](https://github.com/aktau/github-release) Makefile
+
 ## [0.1.0] - 2015-08-27
 ### Breaking Changes
 * Use `mysql_probe start` instead of just `mysql_probe`
