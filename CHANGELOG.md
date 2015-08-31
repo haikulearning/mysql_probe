@@ -13,6 +13,7 @@ Because this project has not reached 1.0.0 yet anything may change at any time. 
 * Initial support for cross-compiling via make
 
 ### Changed
+* Counting the # of connections has been refactored via [Pull #3](https://github.com/haikulearning/mysql_probe/pull/3) so that fewer permissions are required by the `mysql_probe`'s MySQL user.
 * Major improvements to the Makefile inspired by the [akitu/github-release project's](https://github.com/aktau/github-release) Makefile
 
 ## [0.1.0] - 2015-08-27
