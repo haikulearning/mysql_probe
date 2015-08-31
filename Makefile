@@ -64,6 +64,9 @@ osx: bin/darwin/386/$(EXECUTABLE) bin/darwin/amd64/$(EXECUTABLE)
 
 linux: bin/linux/386/$(EXECUTABLE) bin/linux/amd64/$(EXECUTABLE)
 
+release: $(COMPRESSED_EXECUTABLE_TARGETS)
+	git push && git push --tags
+
 clean:
 	rm $(EXECUTABLE) || true
 	rm -rf bin/
