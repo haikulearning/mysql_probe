@@ -314,5 +314,10 @@ func (t *MysqlTest) Connect() error {
 }
 
 func (t *MysqlTest) Log(msg string) {
-	t.jsonlog.Log(msg, t.host, t.iteration)
+	json_msg := map[string]interface{}{
+		"host": t.host,
+		"iteration": t.iteration,
+	}
+
+	t.jsonlog.Log(msg, json_msg)
 }

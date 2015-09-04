@@ -3,6 +3,7 @@ package jsonlog
 import (
   "fmt"
 	"os"
+	"encoding/json"
 	"time"
   //"github.com/haikulearning/mysql_probe/mysqltest"
 )
@@ -26,10 +27,15 @@ func (l *JsonLog) LogFile() *os.File {
 	return l.jsonlog
 }
 
-// This is a very dumb json func. If more interesting stuff needs to be logged,
-// pass it in as a map[string]interface{} and then detect value as int, string, w/e
-// before marshaling json.
-func (l *JsonLog) Log(msg string, host string, iteration uint64) {
-	l.jsonlog.WriteString(fmt.Sprintf("{\"@timestamp\":\"%s\",\"type\":\"mysql_probe\",\"host\":\"%s\",\"iteration\":%v,\"message\":\"%s\"}\n",
-		time.Now().Format(time.RFC3339), host, iteration, msg))
+func (l *JsonLog) Log(msg string, other_data interface{}) {
+	data, err := json.Marshal(other_data)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	l.jsonlog.WriteString(
+		fmt.Sprintf("{\"@timestamp\":\"%s\",\"type\":\"mysql_probe\",\"message\":\"%s\",\"data\":",
+			time.Now().Format(time.RFC3339), msg))
+	l.jsonlog.Write(data)
+	l.jsonlog.WriteString("}\n")
 }
