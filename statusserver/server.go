@@ -8,6 +8,7 @@ import (
   "os"
   "regexp"
   "github.com/haikulearning/mysql_probe/mysqltest"
+	"github.com/haikulearning/mysql_probe/jsonlog"
 )
 
 var required_up_checks = []string{"connect", "threads_connected_count_lte_2400"}
@@ -15,10 +16,15 @@ var required_up_checks = []string{"connect", "threads_connected_count_lte_2400"}
 type StatuServer struct {
 	reportdir     string
 	port          int
+	jsonlog       *jsonlog.JsonLog
 }
 
-func StartStatuServer(reportdir string, port int) *StatuServer {
-	s := StatuServer{reportdir: reportdir, port: port}
+func StartStatuServer(reportdir string, port int, log_path string) *StatuServer {
+
+	jsonlog := jsonlog.Init(log_path)
+	defer jsonlog.LogFile().Close()
+
+	s := StatuServer{reportdir: reportdir, port: port, jsonlog: jsonlog}
 
   s.Start()
 
@@ -82,10 +88,19 @@ func (s *StatuServer) testResultIsUp(testname string) bool {
   check(err)
 
   if match {
-    log.Println("up via " + testpath)
+    s.Log("up via " + testpath)
   } else {
-    log.Println("down via " + testpath + " (skipping all subsequent checks)")
+    s.Log("down via " + testpath + " (skipping all subsequent checks)")
   }
 
   return match
+}
+
+func (s *StatuServer) Log(msg string) {
+	json_msg := map[string]interface{}{
+	//	"host": t.host,
+	//	"iteration": t.iteration,
+	}
+
+	s.jsonlog.Log(msg, json_msg)
 }

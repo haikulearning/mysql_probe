@@ -5,7 +5,6 @@ import (
 	"os"
 	"encoding/json"
 	"time"
-  //"github.com/haikulearning/mysql_probe/mysqltest"
 )
 
 type JsonLog struct {
