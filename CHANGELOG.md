@@ -11,6 +11,7 @@ Because this project has not reached 1.0.0 yet anything may change at any time. 
 ## [0.3.0] - 2015-08-27
 ### Breaking Changes
 * Renamed `--jsonlog` to `--testlog`
+* Changed default value of `--testlog` to `tmp/test.log`, because it's *so*, so verbose for STDOUT!
 
 ### Added
 * Added a `--serverlog` option so that minimal info is written to STDOUT

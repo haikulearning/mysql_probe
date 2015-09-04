@@ -105,7 +105,7 @@ func main() {
 		},
 		cli.StringFlag{
 			Name:   "testlog",
-			Value:  "/dev/stdout",
+			Value:  "tmp/test.log",
 			Usage:  "(test) file to write test results log output in json",
 			EnvVar: "MYSQL_PROBE_TESTLOG",
 		},
@@ -127,7 +127,7 @@ func main() {
 		},
 		cli.StringFlag{
 			Name:   "serverlog",
-			Value:  "/dev/stdout",
+			Value:  "tmp/server.log",
 			Usage:  "(test) file to write server access data in json",
 			EnvVar: "MYSQL_PROBE_SERVERLOG",
 		},
