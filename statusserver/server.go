@@ -54,7 +54,7 @@ func (s *StatuServer) handler(w http.ResponseWriter, r *http.Request) {
 
   for _,testname := range required_up_checks {
     if is_up {
-      is_up = s.testResultIsUp(testname)
+      is_up = s.testResultIsUp(testname, r)
     }
   }
 
@@ -67,7 +67,7 @@ func (s *StatuServer) handler(w http.ResponseWriter, r *http.Request) {
   }
 }
 
-func (s *StatuServer) testResultIsUp(testname string) bool {
+func (s *StatuServer) testResultIsUp(testname string, r *http.Request) bool {
   testpath := mysqltest.TestResultPath(s.reportdir, testname)
   match := false
 
@@ -88,18 +88,19 @@ func (s *StatuServer) testResultIsUp(testname string) bool {
   check(err)
 
   if match {
-    s.Log("up via " + testpath)
+    s.Log("up via " + testpath, r)
   } else {
-    s.Log("down via " + testpath + " (skipping all subsequent checks)")
+    s.Log("down via " + testpath + " (skipping all subsequent checks)", r)
   }
 
   return match
 }
 
-func (s *StatuServer) Log(msg string) {
+func (s *StatuServer) Log(msg string, r *http.Request) {
 	json_msg := map[string]interface{}{
-	//	"host": t.host,
-	//	"iteration": t.iteration,
+		"Method": 		r.Method,
+		"RequestURI": r.RequestURI,
+		"RemoteAddr": r.RemoteAddr,
 	}
 
 	s.jsonlog.Log(msg, json_msg)
