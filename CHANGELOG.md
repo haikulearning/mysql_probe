@@ -8,6 +8,13 @@ Because this project has not reached 1.0.0 yet anything may change at any time. 
 ### Added
 * An initial, basic version of `make release`
 
+## [0.3.0] - 2015-08-27
+### Breaking Changes
+* Renamed `--jsonlog` to `--testlog`
+
+### Added
+* Added a `--serverlog` option so that minimal info is written to STDOUT
+
 ## [0.2.0] - 2015-08-27
 ### Breaking Changes
 * `connection_count_lte_*` report file will no longer be created. Use `threads_connected_count_lte_*` report files instead (they're functionally equivalent).

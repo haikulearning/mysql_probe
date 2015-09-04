@@ -31,7 +31,7 @@ const VERSION string = "0.2.0"
 func test_mysql(c *cli.Context) {
   log.Println("Testing mysql server")
   // Run our mysql tests
-  mysqltest.RunMysqlTest("connection", c.String("host"), c.Int("port"), c.String("user"), c.String("pass"), c.Int("interval"), c.Int("timeout"), c.String("reports"), c.String("jsonlog"))
+  mysqltest.RunMysqlTest("connection", c.String("host"), c.Int("port"), c.String("user"), c.String("pass"), c.Int("interval"), c.Int("timeout"), c.String("reports"), c.String("testlog"))
 }
 
 func serve_status(c *cli.Context) {
@@ -104,7 +104,7 @@ func main() {
 			EnvVar: "MYSQL_PROBE_INTERVAL",
 		},
 		cli.StringFlag{
-			Name:   "jsonlog",
+			Name:   "testlog",
 			Value:  "/dev/stdout",
 			Usage:  "(test) file to write test results log output in json",
 			EnvVar: "MYSQL_PROBE_JSONLOG",
