@@ -19,6 +19,7 @@ package mysqltest
 import (
 	"database/sql"
 	"fmt"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/haikulearning/mysql_probe/jsonlog"
 	"errors"
 	"time"
@@ -194,7 +195,7 @@ func (t *MysqlTest) CheckReplication() (int64, string, error) {
 	rows, err := t.db.Query("SHOW SLAVE STATUS") // queryable from PERFORMANCE_SCHEMA at mysql 5.7.2: http://bugs.mysql.com/bug.php?id=35994
 	if err != nil {
 		description = "Query 'SHOW SLAVE STATUS' failed"
-		t.jsonlog.Log(fmt.Sprintf("%s: %s", description, err.Error()), t.host, t.iteration)
+		t.Log(fmt.Sprintf("%s: %s", description, err.Error()))
 		t.db = nil
 		return 0, description, err
 	}
@@ -205,7 +206,7 @@ func (t *MysqlTest) CheckReplication() (int64, string, error) {
 	cols, err := rows.Columns() // Remember to check err afterwards
 	if err != nil {
 		description = "Couldn't retrieve column information for 'SHOW SLAVE STATUS' statement"
-		t.jsonlog.Log(fmt.Sprintf("%s: %s", description, err.Error()), t.host, t.iteration)
+		t.Log(fmt.Sprintf("%s: %s", description, err.Error()))
 		t.db = nil
 		return 0, description, err
 	}
@@ -240,7 +241,7 @@ func (t *MysqlTest) CheckReplication() (int64, string, error) {
 		description = fmt.Sprintf("Slave running: %s Seconds behind: %d", slave_io_running, seconds_behind_master)
 	}
 
-	t.jsonlog.Log(description, t.host, t.iteration)
+	t.Log(description)
 	return seconds_behind_master, description, err
 }
 
@@ -256,7 +257,7 @@ func (t *MysqlTest) CountThreadInfo() (int64, int64, string, error) {
 	rows, err := t.db.Query("SELECT VARIABLE_NAME, VARIABLE_VALUE FROM INFORMATION_SCHEMA.SESSION_STATUS WHERE VARIABLE_NAME IN ('THREADS_CONNECTED', 'THREADS_RUNNING')")
 	if err != nil {
 		description = "Query 'SELECT ... FROM INFORMATION_SCHEMA.SESSION_STATUS ...' failed"
-		t.jsonlog.Log(fmt.Sprintf("%s: %s", description, err.Error()), t.host, t.iteration)
+		t.Log(fmt.Sprintf("%s: %s", description, err.Error()))
 		t.db = nil
 		return -1, -1, description, err
 	}
@@ -278,12 +279,12 @@ func (t *MysqlTest) CountThreadInfo() (int64, int64, string, error) {
 	threads_connected = threads_connected - 1 // Deduct this connection from teh count.
 
 	description = fmt.Sprintf("Threads Connected: %d; Threads Running: %d", threads_connected, threads_running)
-	t.jsonlog.Log(description, t.host, t.iteration)
+	t.Log(description)
 	return threads_connected, threads_running, description, nil
 }
 
 func (t *MysqlTest) Connect() error {
-	t.jsonlog.Log(fmt.Sprintf("Connecting to %s@%s:%d", t.user, t.host, t.port), t.host, t.iteration)
+	t.Log(fmt.Sprintf("Connecting to %s@%s:%d", t.user, t.host, t.port))
 
 	// Create dsn like such https://github.com/Go-SQL-Driver/MySQL/#dsn-data-source-name
 	// [username[:password]@][protocol[(address)]]/dbname[?param1=value1&...&paramN=valueN]
@@ -293,7 +294,7 @@ func (t *MysqlTest) Connect() error {
 
 	db, err := sql.Open("mysql", dsn)
 	if err != nil {
-		t.jsonlog.Log(fmt.Sprintf("Couldn't open mysql connection: %s", err.Error()), t.host, t.iteration)
+		t.Log(fmt.Sprintf("Couldn't open mysql connection: %s", err.Error()))
 		t.db = nil
 		return err
 	}
@@ -301,7 +302,7 @@ func (t *MysqlTest) Connect() error {
 	// Open doesn't open a connection. Validate DSN data:
 	err = db.Ping()
 	if err != nil {
-		t.jsonlog.Log(fmt.Sprintf("Couldn't connect to mysql server: %s", err.Error()), t.host, t.iteration)
+		t.Log(fmt.Sprintf("Couldn't connect to mysql server: %s", err.Error()))
 		t.db = nil
 		return err
 	}
@@ -310,4 +311,8 @@ func (t *MysqlTest) Connect() error {
 	t.db = db
 	db.Query("SET SESSION wait_timeout=1")
 	return nil
+}
+
+func (t *MysqlTest) Log(msg string) {
+	t.jsonlog.Log(msg, t.host, t.iteration)
 }
