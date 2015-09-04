@@ -4,7 +4,7 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 
 Because this project has not reached 1.0.0 yet anything may change at any time. The public API should not be considered stable. Still, all breaking changes to the public API will be documented in this file.
 
-## [Unreleased][unreleased]
+## [0.3.0] - 2015-09-04
 ### Breaking Changes
 * Renamed `--jsonlog` to `--testlog`
 * Changed default value of `--testlog` to `tmp/test.log`, because it's *so*, so verbose for STDOUT!
@@ -53,7 +53,8 @@ Because this project has not reached 1.0.0 yet anything may change at any time. 
 * "Everything!" This was the initial release.
 
 
-[unreleased]: https://github.com/haikulearning/mysql_probe/compare/v0.2.0...HEAD
+[unreleased]: https://github.com/haikulearning/mysql_probe/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/haikulearning/mysql_probe/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/haikulearning/mysql_probe/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/haikulearning/mysql_probe/compare/v0.0.3...v0.1.0
 [0.0.3]: https://github.com/haikulearning/mysql_probe/compare/v0.0.2...v0.0.3
