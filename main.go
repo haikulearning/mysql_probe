@@ -31,13 +31,13 @@ const VERSION string = "0.2.0"
 func test_mysql(c *cli.Context) {
   log.Println("Testing mysql server")
   // Run our mysql tests
-  mysqltest.RunMysqlTest("connection", c.String("host"), c.Int("port"), c.String("user"), c.String("pass"), c.Int("interval"), c.Int("timeout"), c.String("reports"), c.String("jsonlog"))
+  mysqltest.RunMysqlTest("connection", c.String("host"), c.Int("port"), c.String("user"), c.String("pass"), c.Int("interval"), c.Int("timeout"), c.String("reports"), c.String("testlog"))
 }
 
 func serve_status(c *cli.Context) {
   log.Println("Running status server")
   // Run our status server
-  statusserver.StartStatuServer(c.String("reports"), c.Int("server_port"))
+  statusserver.StartStatuServer(c.String("reports"), c.Int("server_port"), c.String("serverlog"))
 }
 
 func test_and_serve(c *cli.Context) {
@@ -104,10 +104,10 @@ func main() {
 			EnvVar: "MYSQL_PROBE_INTERVAL",
 		},
 		cli.StringFlag{
-			Name:   "jsonlog",
-			Value:  "/dev/stdout",
+			Name:   "testlog",
+			Value:  "tmp/test.log",
 			Usage:  "(test) file to write test results log output in json",
-			EnvVar: "MYSQL_PROBE_JSONLOG",
+			EnvVar: "MYSQL_PROBE_TESTLOG",
 		},
   }
   both_flags := []cli.Flag{
@@ -123,7 +123,13 @@ func main() {
 			Name:   "server_port, s",
 			Value:  3001,
 			Usage:  "(serve) port number where the status server accepts requests",
-			EnvVar: "MYSQL_PROBE_SERVER",
+			EnvVar: "MYSQL_PROBE_SERVERPORT",
+		},
+		cli.StringFlag{
+			Name:   "serverlog",
+			Value:  "tmp/server.log",
+			Usage:  "(test) file to write server access data in json",
+			EnvVar: "MYSQL_PROBE_SERVERLOG",
 		},
   }
 

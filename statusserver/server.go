@@ -8,6 +8,7 @@ import (
   "os"
   "regexp"
   "github.com/haikulearning/mysql_probe/mysqltest"
+	"github.com/haikulearning/mysql_probe/jsonlog"
 )
 
 var required_up_checks = []string{"connect", "threads_connected_count_lte_2400"}
@@ -15,10 +16,15 @@ var required_up_checks = []string{"connect", "threads_connected_count_lte_2400"}
 type StatuServer struct {
 	reportdir     string
 	port          int
+	jsonlog       *jsonlog.JsonLog
 }
 
-func StartStatuServer(reportdir string, port int) *StatuServer {
-	s := StatuServer{reportdir: reportdir, port: port}
+func StartStatuServer(reportdir string, port int, log_path string) *StatuServer {
+
+	jsonlog := jsonlog.Init(log_path)
+	defer jsonlog.LogFile().Close()
+
+	s := StatuServer{reportdir: reportdir, port: port, jsonlog: jsonlog}
 
   s.Start()
 
@@ -48,7 +54,7 @@ func (s *StatuServer) handler(w http.ResponseWriter, r *http.Request) {
 
   for _,testname := range required_up_checks {
     if is_up {
-      is_up = s.testResultIsUp(testname)
+      is_up = s.testResultIsUp(testname, r)
     }
   }
 
@@ -61,7 +67,7 @@ func (s *StatuServer) handler(w http.ResponseWriter, r *http.Request) {
   }
 }
 
-func (s *StatuServer) testResultIsUp(testname string) bool {
+func (s *StatuServer) testResultIsUp(testname string, r *http.Request) bool {
   testpath := mysqltest.TestResultPath(s.reportdir, testname)
   match := false
 
@@ -82,10 +88,20 @@ func (s *StatuServer) testResultIsUp(testname string) bool {
   check(err)
 
   if match {
-    log.Println("up via " + testpath)
+    s.Log("up via " + testpath, r)
   } else {
-    log.Println("down via " + testpath + " (skipping all subsequent checks)")
+    s.Log("down via " + testpath + " (skipping all subsequent checks)", r)
   }
 
   return match
+}
+
+func (s *StatuServer) Log(msg string, r *http.Request) {
+	json_msg := map[string]interface{}{
+		"Method": 		r.Method,
+		"RequestURI": r.RequestURI,
+		"RemoteAddr": r.RemoteAddr,
+	}
+
+	s.jsonlog.Log(msg, json_msg)
 }

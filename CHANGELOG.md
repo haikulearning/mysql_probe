@@ -5,8 +5,14 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 Because this project has not reached 1.0.0 yet anything may change at any time. The public API should not be considered stable. Still, all breaking changes to the public API will be documented in this file.
 
 ## [Unreleased][unreleased]
+### Breaking Changes
+* Renamed `--jsonlog` to `--testlog`
+* Changed default value of `--testlog` to `tmp/test.log`, because it's *so*, so verbose for STDOUT!
+
 ### Added
+* Added a `--serverlog` option so that minimal info is written to STDOUT
 * An initial, basic version of `make release`
+
 
 ## [0.2.0] - 2015-08-27
 ### Breaking Changes

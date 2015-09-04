@@ -29,12 +29,12 @@ func (tw *MysqlTestResultWriter) WriteTextResult(testname string, status string)
 	if err != nil {
 		//log.Fatal(err)
 		desc := fmt.Sprintf("Couldn't open result file \"%s\": ", err.Error())
-		tw.test.JsonLog(desc)
+		tw.test.Log(desc)
 		os.Stderr.WriteString(desc)
 		return
 	}
 	defer file.Close()
-	tw.test.JsonLog(fmt.Sprintf("Test: %s result: %s", testname, status))
+	tw.test.Log(fmt.Sprintf("Test: %s result: %s", testname, status))
 	file.WriteString(status)
 }
 
